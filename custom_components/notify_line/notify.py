@@ -25,6 +25,7 @@ from homeassistant.components.notify import (
 _LOGGER = logging.getLogger(__name__)
 
 BASE_URL = 'https://notify-api.line.me/api/notify'
+ATTR_ACCESSTOKEN = 'access_token'
 ATTR_FILE = 'file'
 ATTR_URL = 'url'
 ATTR_STKPKGID ='stkpkgid'
@@ -54,12 +55,13 @@ class LineNotificationService(BaseNotificationService):
         
     def send_message(self, message="", **kwargs):
         """Send some message."""
-        data = kwargs.get(ATTR_DATA, None) 
+        data = kwargs.get(ATTR_DATA, None)
+        accesstoken = data.get(ATTR_ACCESSTOKEN) if data is not None and ATTR_ACCESSTOKEN in data else self.access_token
         url = data.get(ATTR_URL) if data is not None and ATTR_URL in data else None
         file = {IMAGEFILE:open(data.get(ATTR_FILE),'rb')} if data is not None and ATTR_FILE in data else None
         stkpkgid = data.get(ATTR_STKPKGID) if data is not None and ATTR_STKPKGID in data and ATTR_STKID in data else None
         stkid = data.get(ATTR_STKID) if data is not None and ATTR_STKPKGID in data and ATTR_STKID in data else None        
-        headers = {AUTHORIZATION:"Bearer "+ self.access_token}
+        headers = {AUTHORIZATION:"Bearer "+ accesstoken}
 
         payload = ({
                     'message':message,
